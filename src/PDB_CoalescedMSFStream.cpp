@@ -5,6 +5,11 @@
 #include "PDB_CoalescedMSFStream.h"
 #include "PDB_Util.h"
 #include "PDB_DirectMSFStream.h"
+#include "Foundation/PDB_PointerUtil.h"
+#include "Foundation/PDB_Memory.h"
+#include "Foundation/PDB_DisableWarningsPush.h"
+#include <cstring>
+#include "Foundation/PDB_DisableWarningsPop.h"
 
 
 namespace
@@ -38,6 +43,40 @@ PDB::CoalescedMSFStream::CoalescedMSFStream(void) PDB_NO_EXCEPT
 	, m_data(nullptr)
 	, m_size(0u)
 {
+}
+
+
+// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
+PDB::CoalescedMSFStream::CoalescedMSFStream(CoalescedMSFStream&& other) PDB_NO_EXCEPT
+	: m_ownedData(PDB_MOVE(other.m_ownedData))
+	, m_data(PDB_MOVE(other.m_data))
+	, m_size(PDB_MOVE(other.m_size))
+{
+	other.m_ownedData = nullptr;
+	other.m_data = nullptr;
+	other.m_size = 0u;
+}
+
+
+// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
+PDB::CoalescedMSFStream& PDB::CoalescedMSFStream::operator=(CoalescedMSFStream&& other) PDB_NO_EXCEPT
+{
+	if (this != &other)
+	{
+		PDB_DELETE_ARRAY(m_ownedData);
+
+		m_ownedData = PDB_MOVE(other.m_ownedData);
+		m_data = PDB_MOVE(other.m_data);
+		m_size = PDB_MOVE(other.m_size);
+
+		other.m_ownedData = nullptr;
+		other.m_data = nullptr;
+		other.m_size = 0u;
+	}
+
+	return *this;
 }
 
 

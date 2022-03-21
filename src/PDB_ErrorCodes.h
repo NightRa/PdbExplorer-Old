@@ -2,18 +2,19 @@
 // See LICENSE.txt for licensing details (2-clause BSD License: https://opensource.org/licenses/BSD-2-Clause)
 
 #pragma once
-#include <cstdint>
+
+#include "Foundation/PDB_Macros.h"
+
 
 namespace PDB
 {
-	enum class ErrorCode : uint32_t
+	enum class PDB_NO_DISCARD ErrorCode : unsigned int
 	{
 		Success = 0u,
 
 		// main PDB validation
 		InvalidSuperBlock,
 		InvalidFreeBlockMap,
-		UnhandledDirectorySize,
 
 		// stream validation
 		InvalidSignature,

@@ -3,6 +3,11 @@
 
 #pragma once
 
+#include "Foundation/PDB_Macros.h"
+#include "Foundation/PDB_DisableWarningsPush.h"
+#include <cstdint>
+#include "Foundation/PDB_DisableWarningsPop.h"
+
 
 namespace PDB
 {
@@ -49,11 +54,11 @@ namespace PDB
 		char fileMagic[30u];
 		char padding[2u];
 		uint32_t blockSize;
-		uint32_t freeBlockMapIndex;				// index of the free block map
-		uint32_t blockCount;					// number of blocks in the file
-		uint32_t directorySize;					// size of the stream directory in bytes
+		uint32_t freeBlockMapIndex;										// index of the free block map
+		uint32_t blockCount;											// number of blocks in the file
+		uint32_t directorySize;											// size of the stream directory in bytes
 		uint32_t unknown;
-		uint32_t directoryIndicesBlockIndex;	// index of the block that contains an array of indices of directory blocks
+		PDB_FLEXIBLE_ARRAY_MEMBER(uint32_t, directoryBlockIndices);		// indices of the blocks that make up the directory indices
 	};
 
 	// https://llvm.org/docs/PDB/PdbStream.html#stream-header

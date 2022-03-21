@@ -6,7 +6,7 @@
 #include "PDB_RawFile.h"
 #include "PDB_Util.h"
 #include "PDB_DirectMSFStream.h"
-
+#include "Foundation/PDB_Memory.h"
 
 namespace
 {
@@ -23,6 +23,40 @@ PDB::IPIStream::IPIStream(void) PDB_NO_EXCEPT
 	, m_records(nullptr)
 	, m_recordCount(0u)
 {
+}
+
+
+// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
+PDB::IPIStream::IPIStream(IPIStream&& other) PDB_NO_EXCEPT
+	: m_header(PDB_MOVE(other.m_header))
+	, m_stream(PDB_MOVE(other.m_stream))
+	, m_records(PDB_MOVE(other.m_records))
+	, m_recordCount(PDB_MOVE(other.m_recordCount))
+{
+	other.m_records = nullptr;
+	other.m_recordCount = 0u;
+}
+
+
+// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
+PDB::IPIStream& PDB::IPIStream::operator=(IPIStream&& other) PDB_NO_EXCEPT
+{
+	if (this != &other)
+	{
+		PDB_DELETE_ARRAY(m_records);
+
+		m_header = PDB_MOVE(other.m_header);
+		m_stream = PDB_MOVE(other.m_stream);
+		m_records = PDB_MOVE(other.m_records);
+		m_recordCount = PDB_MOVE(other.m_recordCount);
+
+		other.m_records = nullptr;
+		other.m_recordCount = 0u;
+	}
+
+	return *this;
 }
 
 

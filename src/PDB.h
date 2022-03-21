@@ -3,13 +3,15 @@
 
 #pragma once
 
-#include "PDB_ErrorCodes.h"
 #include "Foundation/PDB_Macros.h"
+#include "PDB_ErrorCodes.h"
+
 
 // https://llvm.org/docs/PDB/index.html
 namespace PDB
 {
 	class RawFile;
+
 
 	// Validates whether a PDB file is valid.
 	PDB_NO_DISCARD ErrorCode ValidateFile(const void* data) PDB_NO_EXCEPT;

@@ -3,6 +3,10 @@
 
 #pragma once
 
+#include "Foundation/PDB_Macros.h"
+#include "Foundation/PDB_DisableWarningsPush.h"
+#include <cstdint>
+#include "Foundation/PDB_DisableWarningsPop.h"
 #include "PDB_CoalescedMSFStream.h"
 
 
@@ -15,9 +19,10 @@ namespace PDB
 	class PDB_NO_DISCARD RawFile
 	{
 	public:
-		explicit RawFile(const void* data) PDB_NO_EXCEPT;
+		RawFile(RawFile&& other) PDB_NO_EXCEPT;
+		RawFile& operator=(RawFile&& other) PDB_NO_EXCEPT;
 
-		PDB_DEFAULT_MOVE(RawFile);
+		explicit RawFile(const void* data) PDB_NO_EXCEPT;
 
 		~RawFile(void) PDB_NO_EXCEPT;
 
