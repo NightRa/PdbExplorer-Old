@@ -70,10 +70,10 @@ PDB::RawFile::RawFile(const void* data) PDB_NO_EXCEPT
 	const uint32_t directoryBlockCount = PDB::ConvertSizeToBlockCount(m_superBlock->directorySize, m_superBlock->blockSize);
 
 	// the directory is made up of directoryBlockCount blocks, so we need that many indices to be read from the blocks that make up the indices
-	CoalescedMSFStream directoryIndicesStream(data, m_superBlock->blockSize, m_superBlock->directoryBlockIndices, directoryBlockCount * sizeof(uint32_t));
+	m_directoryStreamIndices = CoalescedMSFStream(data, m_superBlock->blockSize, m_superBlock->directoryBlockIndices, directoryBlockCount * sizeof(uint32_t));
 
 	// these are the indices of blocks making up the directory stream, now guaranteed to be contiguous
-	const uint32_t* directoryIndices = directoryIndicesStream.GetDataAtOffset<uint32_t>(0u);
+	const uint32_t* directoryIndices = m_directoryStreamIndices.GetDataAtOffset<uint32_t>(0u);
 
 	m_directoryStream = CoalescedMSFStream(data, m_superBlock->blockSize, directoryIndices, m_superBlock->directorySize);
 
@@ -113,6 +113,40 @@ PDB::RawFile::~RawFile(void) PDB_NO_EXCEPT
 	PDB_DELETE_ARRAY(m_streamBlocks);
 }
 
+const PDB::SuperBlock* PDB::RawFile::GetSuperBlock() const
+{
+	return m_superBlock;
+}
+
+const PDB::CoalescedMSFStream& PDB::RawFile::GetDirectoryStreamIndices() const
+{
+	return m_directoryStreamIndices;
+}
+
+uint32_t PDB::RawFile::GetStreamDirectoryNumBlocks() const
+{
+	return PDB::ConvertSizeToBlockCount(m_superBlock->directorySize, m_superBlock->blockSize);
+}
+
+uint32_t PDB::RawFile::GetStreamDirectoryBlocksIndicesSizeInBlocks() const
+{
+	return PDB::ConvertSizeToBlockCount(GetStreamDirectoryNumBlocks() * sizeof(uint32_t), m_superBlock->blockSize);
+}
+
+uint32_t PDB::RawFile::GetStreamCount() const
+{
+	return m_streamCount;
+}
+
+const uint32_t* PDB::RawFile::GetStreamSizes() const
+{
+	return m_streamSizes;
+}
+
+const uint32_t** PDB::RawFile::GetStreamBlocksIndices() const
+{
+	return m_streamBlocks;
+}
 
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------

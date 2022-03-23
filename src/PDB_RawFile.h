@@ -34,9 +34,21 @@ namespace PDB
 		template <typename T>
 		PDB_NO_DISCARD T CreateMSFStream(uint32_t streamIndex, uint32_t streamSize) const PDB_NO_EXCEPT;
 
+	public:
+		// RawPdbNet
+		const SuperBlock* GetSuperBlock() const;
+		const CoalescedMSFStream& GetDirectoryStreamIndices() const;
+		uint32_t GetStreamDirectoryNumBlocks() const;
+		uint32_t GetStreamDirectoryBlocksIndicesSizeInBlocks() const;
+
+		uint32_t GetStreamCount() const;
+		const uint32_t* GetStreamSizes() const;
+		const uint32_t** GetStreamBlocksIndices() const;
+
 	private:
 		const void* m_data;
 		const SuperBlock* m_superBlock;
+		CoalescedMSFStream m_directoryStreamIndices;
 		CoalescedMSFStream m_directoryStream;
 
 		// stream directory
