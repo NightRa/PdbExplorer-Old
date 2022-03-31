@@ -32,6 +32,7 @@
             this.pdbFilePath = new System.Windows.Forms.TextBox();
             this.loadStatus = new System.Windows.Forms.Label();
             this.resultTextArea = new System.Windows.Forms.TextBox();
+            this.pdbTreeView = new System.Windows.Forms.TreeView();
             this.SuspendLayout();
             // 
             // loadPdbButton
@@ -63,18 +64,27 @@
             // 
             // resultTextArea
             // 
-            this.resultTextArea.Location = new System.Drawing.Point(49, 77);
+            this.resultTextArea.Location = new System.Drawing.Point(204, 77);
             this.resultTextArea.Multiline = true;
             this.resultTextArea.Name = "resultTextArea";
             this.resultTextArea.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.resultTextArea.Size = new System.Drawing.Size(739, 361);
+            this.resultTextArea.Size = new System.Drawing.Size(584, 361);
             this.resultTextArea.TabIndex = 3;
+            // 
+            // pdbTreeView
+            // 
+            this.pdbTreeView.Location = new System.Drawing.Point(15, 82);
+            this.pdbTreeView.Name = "pdbTreeView";
+            this.pdbTreeView.Size = new System.Drawing.Size(151, 356);
+            this.pdbTreeView.TabIndex = 4;
+            this.pdbTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.pdbTreeView);
             this.Controls.Add(this.resultTextArea);
             this.Controls.Add(this.loadStatus);
             this.Controls.Add(this.pdbFilePath);
@@ -92,5 +102,6 @@
         private TextBox pdbFilePath;
         private Label loadStatus;
         private TextBox resultTextArea;
+        private TreeView pdbTreeView;
     }
 }
