@@ -8,6 +8,8 @@ namespace PDBExplorer
         public Form1()
         {
             InitializeComponent();
+            pdbFilePath.Text = Path.GetFullPath(Path.Combine(
+                Directory.GetCurrentDirectory(), "../../../../bin/x64/Debug/Examples.pdb"));
         }
 
         String byteToChar(Byte b)
@@ -32,48 +34,65 @@ namespace PDBExplorer
             var superBlock = pdb.GetSuperBlock();
             var blockSize = superBlock.blockSize;
 
+            // Super Block
+
+            var superBlockNode = new TreeNode("SuperBlock")
+            {
+                Tag = $"SuperBlock header:\r\n" +
+                      $"  PDB Magic = '{String.Join("", superBlock.fileMagic.Select(byteToChar))}'\r\n" +
+                      $"  Block Size = {superBlock.blockSize}\r\n" +
+                      $"  Free Block Map Index = {superBlock.freeBlockMapIndex}\r\n" +
+                      $"  Block Count = {superBlock.blockCount}\r\n" +
+                      $"  Stream Directory Size = {superBlock.directorySize} ({pdb.GetStreamDirectoryNumBlocks()} blocks)\r\n" +
+                      $"  Unknown field = {superBlock.unknown}\r\n" +
+                      $"  Stream Directory Blocks indices Block indices = [{String.Join(", ", superBlock.directoryStreamBlockIndices)}]\r\n"
+            };
+
+            // Stream Directory
+
             var streamDirectoryStr = $"Stream Directory:\r\n" +
-                                     $"\t(Stream Directory Block indices = [{String.Join(",", pdb.GetDirectoryStreamIndices())}])\r\n" +
-                                     $"\tStream Count = {pdb.GetStreamCount()}\r\n" +
-                                     $"\tStream Sizes = [{String.Join(",", pdb.GetStreamSizes())}]\r\n" +
-                                     $"\tStream indices:\r\n";
+                         $"  (Stream Directory Block indices = [{String.Join(",", pdb.GetDirectoryStreamIndices())}])\r\n" +
+                         $"  Stream Count = {pdb.GetStreamCount()}\r\n" +
+                         $"  Stream Sizes = [{String.Join(", ", pdb.GetStreamSizes())}]\r\n" +
+                         $"  Stream indices:\r\n";
 
             StringBuilder streamIndicesStr = new StringBuilder(streamDirectoryStr);
             var streamBlockIndices = pdb.GetStreamBlocksIndices();
             for (int i = 0; i < streamBlockIndices.Length; i++)
             {
-                streamIndicesStr.Append($"\t{i}. [{String.Join(",", streamBlockIndices[i])}]\r\n");
+                streamIndicesStr.Append($"  {i}. [{String.Join(",", streamBlockIndices[i])}]\r\n");
             }
-
-            resultTextArea.Text += streamIndicesStr.ToString();
-            var superBlockNode = new TreeNode("SuperBlock")
-            {
-                Tag = $"SuperBlock header:\r\n" +
-                      $"\tPDB Magic = '{String.Join("", superBlock.fileMagic.Select(byteToChar))}'\r\n" +
-                      $"\tBlock Size = {superBlock.blockSize}\r\n" +
-                      $"\tFree Block Map Index = {superBlock.freeBlockMapIndex}\r\n" +
-                      $"\tBlock Count = {superBlock.blockCount}\r\n" +
-                      $"\tStream Directory Size = {superBlock.directorySize} ({pdb.GetStreamDirectoryNumBlocks()} blocks)\r\n" +
-                      $"\tUnknown field = {superBlock.unknown}\r\n" +
-                      $"\tStream Directory Blocks indices Block indices = [{String.Join(",", superBlock.directoryStreamBlockIndices)}]\r\n"
-            };
 
             var streamDirectoryNode = new TreeNode("Stream Directory")
             {
                 Tag = streamIndicesStr.ToString()
             };
 
+            // Individual Streams
+
+            var streamNodes = new TreeNode[streamBlockIndices.Length];
+            for (int i = 0; i < streamNodes.Length; i++)
+            {
+                var streamNode = new TreeNode($"Stream {i}");
+                streamNodes[i] = streamNode;
+                streamNode.Tag = 
+                    $"Stream {i}\r\n" +
+                    $"  Stream size = {pdb.GetStreamSizes()[i]}\r\n" + 
+                    $"  Stream blocks = [{String.Join(", ", streamBlockIndices[i])}]";
+            }
+
             pdbTreeView.BeginUpdate();
             pdbTreeView.Nodes.Clear();
             pdbTreeView.Nodes.Add(superBlockNode);
             pdbTreeView.Nodes.Add(streamDirectoryNode);
+            streamDirectoryNode.Nodes.AddRange(streamNodes);
             pdbTreeView.SelectedNode = superBlockNode;
             pdbTreeView.EndUpdate();
         }
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            resultTextArea.Text = $"Selected {e.Node?.Tag}";
+            resultTextArea.Text = e.Node?.Tag.ToString();
         }
     }
 }

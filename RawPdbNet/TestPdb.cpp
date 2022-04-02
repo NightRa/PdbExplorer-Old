@@ -1,15 +1,21 @@
 #include "TestPdb.h"
 #include "..\src\PDB_Util.h"
 
+template <class A, class B>
+static array<B>^ ToManagedArrayCast(const A* arr, uint32_t size)
+{
+	array<B>^ managed_arr = gcnew array<B>(size);
+	for (uint32_t i = 0; i < size; i++)
+	{
+		managed_arr[i] = (B)arr[i];
+	}
+	return managed_arr;
+}
+
 template <class T>
 static array<T>^ ToManagedArray(const T* arr, uint32_t size)
 {
-	array<T>^ managed_arr = gcnew array<T>(size);
-	for (uint32_t i = 0; i < size; i++)
-	{
-		managed_arr[i] = arr[i];
-	}
-	return managed_arr;
+	return ToManagedArrayCast<T, T>(arr, size);
 }
 
 RawPdbNet::Pdb::Pdb(array<unsigned char>^ data)
@@ -67,9 +73,9 @@ uint32_t RawPdbNet::Pdb::GetStreamCount()
 	return _pdb->GetStreamCount();
 }
 
-array<uint32_t>^ RawPdbNet::Pdb::GetStreamSizes()
+array<int32_t>^ RawPdbNet::Pdb::GetStreamSizes()
 {
-	return ToManagedArray(_pdb->GetStreamSizes(), GetStreamCount());
+	return ToManagedArrayCast<uint32_t, int32_t>(_pdb->GetStreamSizes(), GetStreamCount());
 }
 
 array<array<uint32_t>^>^ RawPdbNet::Pdb::GetStreamBlocksIndices()
@@ -78,7 +84,7 @@ array<array<uint32_t>^>^ RawPdbNet::Pdb::GetStreamBlocksIndices()
 	const uint32_t** nativeIndices = _pdb->GetStreamBlocksIndices();
 	auto streamSizes = GetStreamSizes();
 
-	for (uint32_t i = 0; i < streamBlocksIndices->Length; i++)
+	for (int i = 0; i < streamBlocksIndices->Length; i++)
 	{
 		streamBlocksIndices[i] = ToManagedArray(nativeIndices[i], PDB::ConvertSizeToBlockCount(streamSizes[i], _pdb->GetSuperBlock()->blockSize));
 	}

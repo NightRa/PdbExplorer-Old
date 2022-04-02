@@ -45,7 +45,7 @@ namespace RawPdbNet
 		array<uint32_t>^ GetDirectoryStreamIndices();
 
 		uint32_t GetStreamCount();
-		array<uint32_t>^ GetStreamSizes();
+		array<int32_t>^ GetStreamSizes();
 		array<array<uint32_t>^>^ GetStreamBlocksIndices();
 
 		static ErrorCode CheckFile(array<Byte>^ data);
