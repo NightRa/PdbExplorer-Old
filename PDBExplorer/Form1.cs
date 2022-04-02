@@ -32,13 +32,12 @@ namespace PDBExplorer
 
             var pdb = new Pdb(file);
             var superBlock = pdb.GetSuperBlock();
-            var blockSize = superBlock.blockSize;
 
             // Super Block
-
             var superBlockNode = new TreeNode("SuperBlock")
             {
-                Tag = $"SuperBlock header:\r\n" +
+                Tag = () => 
+                      $"SuperBlock header:\r\n" +
                       $"  PDB Magic = '{String.Join("", superBlock.fileMagic.Select(byteToChar))}'\r\n" +
                       $"  Block Size = {superBlock.blockSize}\r\n" +
                       $"  Free Block Map Index = {superBlock.freeBlockMapIndex}\r\n" +
@@ -48,24 +47,18 @@ namespace PDBExplorer
                       $"  Stream Directory Blocks indices Block indices = [{String.Join(", ", superBlock.directoryStreamBlockIndices)}]\r\n"
             };
 
-            // Stream Directory
-
-            var streamDirectoryStr = $"Stream Directory:\r\n" +
-                         $"  (Stream Directory Block indices = [{String.Join(",", pdb.GetDirectoryStreamIndices())}])\r\n" +
-                         $"  Stream Count = {pdb.GetStreamCount()}\r\n" +
-                         $"  Stream Sizes = [{String.Join(", ", pdb.GetStreamSizes())}]\r\n" +
-                         $"  Stream indices:\r\n";
-
-            StringBuilder streamIndicesStr = new StringBuilder(streamDirectoryStr);
             var streamBlockIndices = pdb.GetStreamBlocksIndices();
-            for (int i = 0; i < streamBlockIndices.Length; i++)
-            {
-                streamIndicesStr.Append($"  {i}. [{String.Join(",", streamBlockIndices[i])}]\r\n");
-            }
+            var streamSizes = pdb.GetStreamSizes();
 
+            // Stream Directory
             var streamDirectoryNode = new TreeNode("Stream Directory")
             {
-                Tag = streamIndicesStr.ToString()
+                Tag = () => 
+                         $"Stream Directory:\r\n" +
+                         $"  (Stream Directory Block indices = [{String.Join(",", pdb.GetDirectoryStreamIndices())}])\r\n" +
+                         $"  Stream Count = {pdb.GetStreamCount()}\r\n" +
+                         $"  Stream Sizes[{streamSizes.Length}]\r\n" +
+                         $"  Stream Blocks[{streamBlockIndices.Length}][#Stream i Blocks]"
             };
 
             // Individual Streams
@@ -73,12 +66,13 @@ namespace PDBExplorer
             var streamNodes = new TreeNode[streamBlockIndices.Length];
             for (int i = 0; i < streamNodes.Length; i++)
             {
+                var streamIndex = i;
                 var streamNode = new TreeNode($"Stream {i}");
                 streamNodes[i] = streamNode;
-                streamNode.Tag = 
-                    $"Stream {i}\r\n" +
-                    $"  Stream size = {pdb.GetStreamSizes()[i]}\r\n" + 
-                    $"  Stream blocks = [{String.Join(", ", streamBlockIndices[i])}]";
+                streamNode.Tag = () =>
+                    $"Stream {streamIndex}\r\n" +
+                    $"  Stream size = {streamSizes[streamIndex]}\r\n" + 
+                    $"  Stream blocks = [{String.Join(", ", streamBlockIndices[streamIndex])}]";
             }
 
             pdbTreeView.BeginUpdate();
@@ -92,7 +86,8 @@ namespace PDBExplorer
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            resultTextArea.Text = e.Node?.Tag.ToString();
+            var contentFunc = (Func<String>?)e.Node?.Tag;
+            resultTextArea.Text = contentFunc == null ? "Error: No content for this item!" : contentFunc();
         }
     }
 }

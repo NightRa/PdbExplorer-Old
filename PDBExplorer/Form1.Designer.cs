@@ -75,10 +75,10 @@
             // 
             // pdbTreeView
             // 
-            this.pdbTreeView.Location = new System.Drawing.Point(13, 62);
+            this.pdbTreeView.Location = new System.Drawing.Point(13, 58);
             this.pdbTreeView.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pdbTreeView.Name = "pdbTreeView";
-            this.pdbTreeView.Size = new System.Drawing.Size(144, 268);
+            this.pdbTreeView.Size = new System.Drawing.Size(144, 272);
             this.pdbTreeView.TabIndex = 4;
             this.pdbTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             // 
