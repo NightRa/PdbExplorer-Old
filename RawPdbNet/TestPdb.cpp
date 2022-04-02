@@ -92,8 +92,58 @@ array<array<uint32_t>^>^ RawPdbNet::Pdb::GetStreamBlocksIndices()
 	return streamBlocksIndices;
 }
 
+RawPdbNet::PdbStream^ RawPdbNet::Pdb::GetStream(uint32_t stream_index)
+{
+	return gcnew PdbStream(this, stream_index);
+}
+
 RawPdbNet::ErrorCode RawPdbNet::Pdb::CheckFile(array<unsigned char>^ data)
 {
 	pin_ptr<Byte> p = &data[0];
 	return (RawPdbNet::ErrorCode)PDB::ValidateFile(p);
+}
+
+PDB::RawFile* RawPdbNet::Pdb::Get()
+{
+	return _pdb;
+}
+
+RawPdbNet::PdbStream::PdbStream(Pdb^ pdb, uint32_t stream_index):
+	_pdb(pdb),
+	_stream_index(stream_index)
+{}
+
+uint32_t RawPdbNet::PdbStream::GetStreamIndex()
+{
+	return _stream_index;
+}
+
+int32_t RawPdbNet::PdbStream::GetStreamSize()
+{
+	return _pdb->GetStreamSizes()[_stream_index];
+}
+
+array<uint32_t>^ RawPdbNet::PdbStream::GetStreamBlockIndices()
+{
+	const uint32_t* indices = _pdb->Get()->GetStreamBlocksIndices()[_stream_index];
+	uint32_t num_blocks = PDB::ConvertSizeToBlockCount(GetStreamSize(), _pdb->GetSuperBlock()->blockSize);
+
+	return ToManagedArray(indices, num_blocks);
+}
+
+array<Byte>^ RawPdbNet::PdbStream::GetData()
+{
+	int32_t streamSize = GetStreamSize();
+	if (streamSize <= 0)
+	{
+		return gcnew array<Byte>(0);
+	}
+
+	array<Byte>^ data_arr = gcnew array<Byte>(streamSize);
+	pin_ptr<Byte> data_ptr = &data_arr[0];
+
+	PDB::DirectMSFStream stream = _pdb->Get()->CreateMSFStream<PDB::DirectMSFStream>(_stream_index);
+	stream.ReadAtOffset(data_ptr, data_arr->Length, 0);
+
+	return data_arr;
 }

@@ -31,8 +31,8 @@
             this.loadPdbButton = new System.Windows.Forms.Button();
             this.pdbFilePath = new System.Windows.Forms.TextBox();
             this.loadStatus = new System.Windows.Forms.Label();
-            this.resultTextArea = new System.Windows.Forms.TextBox();
             this.pdbTreeView = new System.Windows.Forms.TreeView();
+            this.resultPanel = new System.Windows.Forms.Panel();
             this.SuspendLayout();
             // 
             // loadPdbButton
@@ -63,16 +63,6 @@
             this.loadStatus.TabIndex = 2;
             this.loadStatus.Text = "Load Status";
             // 
-            // resultTextArea
-            // 
-            this.resultTextArea.Location = new System.Drawing.Point(178, 58);
-            this.resultTextArea.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.resultTextArea.Multiline = true;
-            this.resultTextArea.Name = "resultTextArea";
-            this.resultTextArea.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.resultTextArea.Size = new System.Drawing.Size(512, 272);
-            this.resultTextArea.TabIndex = 3;
-            // 
             // pdbTreeView
             // 
             this.pdbTreeView.Location = new System.Drawing.Point(13, 58);
@@ -82,13 +72,20 @@
             this.pdbTreeView.TabIndex = 4;
             this.pdbTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             // 
+            // resultPanel
+            // 
+            this.resultPanel.Location = new System.Drawing.Point(178, 58);
+            this.resultPanel.Name = "resultPanel";
+            this.resultPanel.Size = new System.Drawing.Size(512, 272);
+            this.resultPanel.TabIndex = 5;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(700, 338);
+            this.Controls.Add(this.resultPanel);
             this.Controls.Add(this.pdbTreeView);
-            this.Controls.Add(this.resultTextArea);
             this.Controls.Add(this.loadStatus);
             this.Controls.Add(this.pdbFilePath);
             this.Controls.Add(this.loadPdbButton);
@@ -105,7 +102,7 @@
         private Button loadPdbButton;
         private TextBox pdbFilePath;
         private Label loadStatus;
-        private TextBox resultTextArea;
         private TreeView pdbTreeView;
+        private Panel resultPanel;
     }
 }

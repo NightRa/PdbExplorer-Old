@@ -2,6 +2,7 @@
 
 #include "..\src\PDB.h"
 #include "..\src\PDB_RawFile.h"
+#include "..\src\PDB_DirectMSFStream.h"
 
 using namespace System;
 
@@ -33,6 +34,8 @@ namespace RawPdbNet
 		array<uint32_t>^ directoryStreamBlockIndices;
 	};
 
+	ref class PdbStream;
+
 	public ref class Pdb
 	{
 	public:
@@ -48,9 +51,30 @@ namespace RawPdbNet
 		array<int32_t>^ GetStreamSizes();
 		array<array<uint32_t>^>^ GetStreamBlocksIndices();
 
+		PdbStream^ GetStream(uint32_t stream_index);
+
+	public:
+		PDB::RawFile* Get();
+
+	public:
 		static ErrorCode CheckFile(array<Byte>^ data);
 
 	private:
 		PDB::RawFile* _pdb;
+	};
+
+	public ref class PdbStream
+	{
+	public:
+		PdbStream(Pdb^ pdb, uint32_t stream_index);
+
+		uint32_t GetStreamIndex();
+		int32_t GetStreamSize();
+		array<uint32_t>^ GetStreamBlockIndices();
+		array<Byte>^ GetData();
+
+	private:
+		Pdb^ _pdb;
+		uint32_t _stream_index;
 	};
 }

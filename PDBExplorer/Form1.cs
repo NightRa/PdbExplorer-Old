@@ -1,8 +1,28 @@
+using System.Runtime.InteropServices;
 using System.Text;
 using RawPdbNet;
 
 namespace PDBExplorer
 {
+    public static class DrawingControl
+    {
+        [DllImport("user32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, Int32 wMsg, bool wParam, Int32 lParam);
+
+        private const int WM_SETREDRAW = 11;
+
+        public static void SuspendDrawing(this Control parent)
+        {
+            SendMessage(parent.Handle, WM_SETREDRAW, false, 0);
+        }
+
+        public static void ResumeDrawing(this Control parent)
+        {
+            SendMessage(parent.Handle, WM_SETREDRAW, true, 0);
+            parent.Refresh();
+        }
+    }
+
     public partial class Form1 : Form
     {
         public Form1()
@@ -36,7 +56,7 @@ namespace PDBExplorer
             // Super Block
             var superBlockNode = new TreeNode("SuperBlock")
             {
-                Tag = () => 
+                Tag = () => new ResultAreaControl(
                       $"SuperBlock header:\r\n" +
                       $"  PDB Magic = '{String.Join("", superBlock.fileMagic.Select(byteToChar))}'\r\n" +
                       $"  Block Size = {superBlock.blockSize}\r\n" +
@@ -44,7 +64,7 @@ namespace PDBExplorer
                       $"  Block Count = {superBlock.blockCount}\r\n" +
                       $"  Stream Directory Size = {superBlock.directorySize} ({pdb.GetStreamDirectoryNumBlocks()} blocks)\r\n" +
                       $"  Unknown field = {superBlock.unknown}\r\n" +
-                      $"  Stream Directory Blocks indices Block indices = [{String.Join(", ", superBlock.directoryStreamBlockIndices)}]\r\n"
+                      $"  Stream Directory Blocks indices Block indices = [{String.Join(", ", superBlock.directoryStreamBlockIndices)}]\r\n")
             };
 
             var streamBlockIndices = pdb.GetStreamBlocksIndices();
@@ -53,26 +73,23 @@ namespace PDBExplorer
             // Stream Directory
             var streamDirectoryNode = new TreeNode("Stream Directory")
             {
-                Tag = () => 
+                Tag = () => new ResultAreaControl(
                          $"Stream Directory:\r\n" +
                          $"  (Stream Directory Block indices = [{String.Join(",", pdb.GetDirectoryStreamIndices())}])\r\n" +
                          $"  Stream Count = {pdb.GetStreamCount()}\r\n" +
                          $"  Stream Sizes[{streamSizes.Length}]\r\n" +
-                         $"  Stream Blocks[{streamBlockIndices.Length}][#Stream i Blocks]"
+                         $"  Stream Blocks[{streamBlockIndices.Length}][#Stream i Blocks]")
             };
 
             // Individual Streams
 
             var streamNodes = new TreeNode[streamBlockIndices.Length];
-            for (int i = 0; i < streamNodes.Length; i++)
+            for (UInt32 i = 0; i < streamNodes.Length; i++)
             {
                 var streamIndex = i;
                 var streamNode = new TreeNode($"Stream {i}");
                 streamNodes[i] = streamNode;
-                streamNode.Tag = () =>
-                    $"Stream {streamIndex}\r\n" +
-                    $"  Stream size = {streamSizes[streamIndex]}\r\n" + 
-                    $"  Stream blocks = [{String.Join(", ", streamBlockIndices[streamIndex])}]";
+                streamNode.Tag = () => new StreamControl(pdb.GetStream(streamIndex));
             }
 
             pdbTreeView.BeginUpdate();
@@ -86,8 +103,15 @@ namespace PDBExplorer
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            var contentFunc = (Func<String>?)e.Node?.Tag;
-            resultTextArea.Text = contentFunc == null ? "Error: No content for this item!" : contentFunc();
+            var contentFunc = (Func<Control>?)e.Node?.Tag;
+            Control resultArea = contentFunc == null ? new ResultAreaControl("Error: No content for this item!") : contentFunc();
+
+            resultPanel.SuspendDrawing();
+
+            resultPanel.Controls.Clear();
+            resultPanel.Controls.Add(resultArea);
+
+            resultPanel.ResumeDrawing();
         }
     }
 }
