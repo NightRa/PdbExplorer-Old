@@ -4,25 +4,6 @@ using RawPdbNet;
 
 namespace PDBExplorer
 {
-    public static class DrawingControl
-    {
-        [DllImport("user32.dll")]
-        public static extern int SendMessage(IntPtr hWnd, Int32 wMsg, bool wParam, Int32 lParam);
-
-        private const int WM_SETREDRAW = 11;
-
-        public static void SuspendDrawing(this Control parent)
-        {
-            SendMessage(parent.Handle, WM_SETREDRAW, false, 0);
-        }
-
-        public static void ResumeDrawing(this Control parent)
-        {
-            SendMessage(parent.Handle, WM_SETREDRAW, true, 0);
-            parent.Refresh();
-        }
-    }
-
     public partial class Form1 : Form
     {
         public Form1()
@@ -92,6 +73,15 @@ namespace PDBExplorer
                 streamNode.Tag = () => new StreamControl(pdb.GetStream(streamIndex));
             }
 
+            var pdbInfoHeader = pdb.GetPdbInfoStream();
+            var pdbStreamNode = new TreeNode("PDB Info Header");
+            pdbStreamNode.Tag = () => new ResultAreaControl($"PDB Info Header:\r\n" +
+                                                            $"  Version = {pdbInfoHeader.version} = {(UInt32)pdbInfoHeader.version}\r\n" +
+                                                            $"  Signature = Timestamp = {pdbInfoHeader.signature} = {new DateTime(1970, 1, 1).AddSeconds(pdbInfoHeader.signature)}\r\n" +
+                                                            $"  PDB Age = {pdbInfoHeader.age}\r\n" +
+                                                            $"  PDB Guid = {(Guid)pdbInfoHeader.guid}");
+            streamNodes[1].Nodes.Add(pdbStreamNode);
+
             pdbTreeView.BeginUpdate();
             pdbTreeView.Nodes.Clear();
             pdbTreeView.Nodes.Add(superBlockNode);
@@ -112,6 +102,25 @@ namespace PDBExplorer
             resultPanel.Controls.Add(resultArea);
 
             resultPanel.ResumeDrawing();
+        }
+    }
+
+    public static class DrawingControl
+    {
+        [DllImport("user32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, Int32 wMsg, bool wParam, Int32 lParam);
+
+        private const int WM_SETREDRAW = 11;
+
+        public static void SuspendDrawing(this Control parent)
+        {
+            SendMessage(parent.Handle, WM_SETREDRAW, false, 0);
+        }
+
+        public static void ResumeDrawing(this Control parent)
+        {
+            SendMessage(parent.Handle, WM_SETREDRAW, true, 0);
+            parent.Refresh();
         }
     }
 }

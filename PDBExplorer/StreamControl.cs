@@ -17,6 +17,7 @@ namespace PDBExplorer
     {
         private PdbStream _pdbStream;
 
+        // Only for editor
         public StreamControl()
         {
             InitializeComponent();

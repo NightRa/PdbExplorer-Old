@@ -36,18 +36,18 @@
             // resultTextArea
             // 
             this.resultTextArea.Location = new System.Drawing.Point(0, 0);
-            this.resultTextArea.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.resultTextArea.Multiline = true;
             this.resultTextArea.Name = "resultTextArea";
             this.resultTextArea.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.resultTextArea.Size = new System.Drawing.Size(512, 272);
+            this.resultTextArea.Size = new System.Drawing.Size(585, 361);
             this.resultTextArea.TabIndex = 4;
             // 
             // saveStreamButton
             // 
-            this.saveStreamButton.Location = new System.Drawing.Point(409, 3);
+            this.saveStreamButton.Location = new System.Drawing.Point(458, 4);
+            this.saveStreamButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.saveStreamButton.Name = "saveStreamButton";
-            this.saveStreamButton.Size = new System.Drawing.Size(82, 23);
+            this.saveStreamButton.Size = new System.Drawing.Size(100, 31);
             this.saveStreamButton.TabIndex = 5;
             this.saveStreamButton.Text = "Save Stream";
             this.saveStreamButton.UseVisualStyleBackColor = true;
@@ -55,9 +55,10 @@
             // 
             // openStreamButton
             // 
-            this.openStreamButton.Location = new System.Drawing.Point(321, 3);
+            this.openStreamButton.Location = new System.Drawing.Point(352, 4);
+            this.openStreamButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.openStreamButton.Name = "openStreamButton";
-            this.openStreamButton.Size = new System.Drawing.Size(82, 23);
+            this.openStreamButton.Size = new System.Drawing.Size(100, 31);
             this.openStreamButton.TabIndex = 6;
             this.openStreamButton.Text = "Open in 010";
             this.openStreamButton.UseVisualStyleBackColor = true;
@@ -65,13 +66,14 @@
             // 
             // StreamControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.openStreamButton);
             this.Controls.Add(this.saveStreamButton);
             this.Controls.Add(this.resultTextArea);
+            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "StreamControl";
-            this.Size = new System.Drawing.Size(512, 272);
+            this.Size = new System.Drawing.Size(585, 363);
             this.ResumeLayout(false);
             this.PerformLayout();
 

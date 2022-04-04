@@ -18,9 +18,15 @@
     <ClInclude Include="TestPdb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Streams.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TestPdb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Streams.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

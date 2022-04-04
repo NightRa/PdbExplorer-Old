@@ -3,6 +3,7 @@
 #include "..\src\PDB.h"
 #include "..\src\PDB_RawFile.h"
 #include "..\src\PDB_DirectMSFStream.h"
+#include "Streams.h"
 
 using namespace System;
 
@@ -52,6 +53,7 @@ namespace RawPdbNet
 		array<array<uint32_t>^>^ GetStreamBlocksIndices();
 
 		PdbStream^ GetStream(uint32_t stream_index);
+		PdbInfoStreamHeader^ GetPdbInfoStream();
 
 	public:
 		PDB::RawFile* Get();

@@ -1,5 +1,14 @@
 #include "TestPdb.h"
+
 #include "..\src\PDB_Util.h"
+#include "..\src\PDB_InfoStream.h"
+
+#define MB_OK                       0x00000000L
+extern "C" int __stdcall MessageBoxW(
+	_In_opt_ void* hWnd,
+	_In_opt_ const wchar_t* lpText,
+	_In_opt_ const wchar_t* lpCaption,
+	_In_ uint32_t uType);
 
 template <class A, class B>
 static array<B>^ ToManagedArrayCast(const A* arr, uint32_t size)
@@ -26,6 +35,7 @@ RawPdbNet::Pdb::Pdb(array<unsigned char>^ data)
 
 RawPdbNet::Pdb::~Pdb()
 {
+	MessageBoxW(nullptr, L"text", L"caption", MB_OK);
 	delete _pdb;
 }
 
@@ -97,6 +107,18 @@ RawPdbNet::PdbStream^ RawPdbNet::Pdb::GetStream(uint32_t stream_index)
 	return gcnew PdbStream(this, stream_index);
 }
 
+RawPdbNet::PdbInfoStreamHeader^ RawPdbNet::Pdb::GetPdbInfoStream()
+{
+	auto info_stream = PDB::InfoStream(*_pdb);
+	auto* header = info_stream.GetHeader();
+	PdbInfoStreamHeader^ gc_header = gcnew PdbInfoStreamHeader;
+	gc_header->version = static_cast<PdbVersion>(header->version);
+	gc_header->signature = header->signature;
+	gc_header->age = header->age;
+	gc_header->guid = gcnew Guid(header->guid.Data1, header->guid.Data2, header->guid.Data3, ToManagedArray(header->guid.Data4, sizeof(header->guid.Data4)));
+	return gc_header;
+}
+
 RawPdbNet::ErrorCode RawPdbNet::Pdb::CheckFile(array<unsigned char>^ data)
 {
 	pin_ptr<Byte> p = &data[0];
@@ -120,7 +142,7 @@ uint32_t RawPdbNet::PdbStream::GetStreamIndex()
 
 int32_t RawPdbNet::PdbStream::GetStreamSize()
 {
-	return _pdb->GetStreamSizes()[_stream_index];
+	return _pdb->Get()->GetStreamSizes()[_stream_index];
 }
 
 array<uint32_t>^ RawPdbNet::PdbStream::GetStreamBlockIndices()
