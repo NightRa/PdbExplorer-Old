@@ -1,0 +1,75 @@
+//------------------------------------------------
+//--- 010 Editor v12.0.1 Binary Template
+//
+//      File: 
+//   Authors: 
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+struct PdbInfoHeader
+{
+  uint32 Version;
+  time_t Signature;
+  uint32 Age;
+  GUID Guid;
+};
+
+PdbInfoHeader header;
+
+typedef struct
+{
+  string Name;
+} Name_t <read=(Name)>;
+
+uint32 NamesBufferSize;
+local int64 NamesLoc = FTell();
+local uint32 RemainingSize = NamesBufferSize;
+while (RemainingSize > 0) {
+  Name_t StreamName;
+  RemainingSize -= sizeof(StreamName);
+}
+
+struct BitVector
+{
+  uint32 WordCount;
+  uint32 Words[WordCount];
+};
+
+typedef struct
+{
+  uint32 NameOffset;
+  uint32 StreamId;
+} HashTableEntry <read=DisplayEntry>;
+
+string DisplayEntry(HashTableEntry& entry)
+{
+    return Str("Stream #%d: \"%s\"", entry.StreamId, ReadString(NamesLoc + entry.NameOffset));
+}
+
+typedef struct HashTable
+{
+  uint32 Size;
+  uint32 Capacity;
+  BitVector OkBuckets;
+  BitVector DeletedBuckets;
+  HashTableEntry Entries[Size];
+};
+
+HashTable stringsTable;
+
+enum <uint32> Features {
+  VC110_IPI_PRESENT = 20091201,
+  VC140_IPI_PRESENT = 20140508,
+  NoTypeMerge = 0x4D544F4E,
+  MinimalDebugInfo = 0x494E494D,
+};
+
+while (!FEof())
+{
+  Features feature;
+}
